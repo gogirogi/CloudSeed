@@ -4,7 +4,7 @@
         xmlns:cloudSeed="clr-namespace:CloudSeed"
         x:Class="CloudSeed.UI.CloudSeedView"
         x:Name="Main"
-        Height="386" Width="995">
+        Height="386" Width="935">
     <UserControl.Resources>
         <ResourceDictionary Source="Styles.xaml" />
     </UserControl.Resources>
@@ -73,9 +73,9 @@
                 <ColumnDefinition Width="Auto" /> 
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="EQ" Margin="5,0" Style="{StaticResource MainLabelStyle}" />
-            <Label Grid.Column="1" Content="Diffuse" Margin="5,0" Style="{StaticResource MainLabelStyle}" />
-            <Label Grid.Column="2" Content="Grain" Margin="5,0" Style="{StaticResource MainLabelStyle}" />
+            <Label Grid.Column="0" Content="EQ" Margin="5,0" Style="{StaticResource MainLabelClickStyle}" MouseDown="ShowEq" />
+            <Label Grid.Column="1" Content="Diffuse" Margin="5,0" Style="{StaticResource MainLabelClickStyle}" MouseDown="ShowDiffuse" />
+            <Label Grid.Column="2" Content="Grain" Margin="5,0" Style="{StaticResource MainLabelClickStyle}" MouseDown="ShowGrain" />
         </Grid>
 
         <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=BoxContainerStyle}">
@@ -186,9 +186,11 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label Content="Time" Grid.Row="3" Grid.Column="0" />
-                <Label Content="Decay" Grid.Row="3" Grid.Column="1"  />
-                <Label Content="Time R" Grid.Row="5" Grid.Column="0"  Visibility="{Binding DelayMode, Converter={StaticResource bvc}}" />
+                <Label Content="Time" Grid.Row="3" Grid.Column="0" Visibility="{Binding DelayMode, Converter={StaticResource ibvc}, FallbackValue=Visible}" />
+                <Label Content="Decay" Grid.Row="3" Grid.Column="1" Visibility="{Binding DelayMode, Converter={StaticResource ibvc}, FallbackValue=Visible}" />
+                <Label Content="Time L" Grid.Row="3" Grid.Column="0" Visibility="{Binding DelayMode, Converter={StaticResource bvc}, FallbackValue=collapsed}" />
+                <Label Content="Decay L" Grid.Row="3" Grid.Column="1" Visibility="{Binding DelayMode, Converter={StaticResource bvc}, FallbackValue=collapsed}" />
+                <Label Content="Time R" Grid.Row="5" Grid.Column="0" Visibility="{Binding DelayMode, Converter={StaticResource bvc}}" />
                 <Label Content="Decay R" Grid.Row="5" Grid.Column="1" Visibility="{Binding DelayMode, Converter={StaticResource bvc}}" />
                 
                 <Label Content="Mod Amt." Grid.Row="3" Grid.Column="2" />
@@ -205,15 +207,10 @@
 
                 <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineModAmount" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="2" Grid.Column="2" />
                 <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineModRate" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="4" Grid.Column="2" />
-
-                
-                
-                
-               
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ResourceKey=BoxContainerStyle}" Visibility="Visible">
+        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ResourceKey=BoxContainerStyle}" x:Name="DiffuseGrid" Visibility="collapsed">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -252,7 +249,7 @@
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ResourceKey=BoxContainerStyle}" Visibility="Collapsed">
+        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ResourceKey=BoxContainerStyle}" x:Name="EqGrid" Visibility="Collapsed">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -285,6 +282,46 @@
                 <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostLowShelfFrequency" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="0"  />
                 <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostHighShelfFrequency" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="1" />
                 <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostCutoffFrequency" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="2" />
+
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostLowShelfGain" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="0" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostHighShelfGain" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="1" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="CrossSeed" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="4" Grid.Column="2" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ResourceKey=BoxContainerStyle}" x:Name="GrainGrid" Visibility="Visible">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Label Content="Grain Count" Grid.Row="3" Grid.Column="0" />
+                <Label Content="Pitch Shift" Grid.Row="3" Grid.Column="1" />
+                <Label Content="Rand Pitch" Grid.Row="3" Grid.Column="2" />
+
+                <Label Content="Grain Len" Grid.Row="5" Grid.Column="0" />
+                <Label Content="Pan Spread" Grid.Row="5" Grid.Column="1" />
+                <Label Content="Rand Time" Grid.Row="5" Grid.Column="2" />
+                
+                <wpfUi:FlatToggleButton Grid.Column="0" Grid.Row="0" IsChecked="True" />
+                <wpfUi:FlatToggleButton Grid.Column="1" Grid.Row="0" IsChecked="True" />
+                <wpfUi:FlatToggleButton Grid.Column="2" Grid.Row="0" IsChecked="True" />
+
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostLowShelfFrequency" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="0"  />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostHighShelfFrequency" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="1" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostCutoffFrequency" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="2" Grid.Column="2" />
 
                 <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostLowShelfGain" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="0" />
                 <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="PostHighShelfGain" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="1" />

@@ -163,5 +163,26 @@ namespace CloudSeed.UI
 			dialog.Owner = Parent as Window;
 			dialog.ShowDialog();
 		}
-	}
+
+        private void ShowEq(object sender, MouseButtonEventArgs e)
+        {
+            DiffuseGrid.Visibility = Visibility.Collapsed;
+            GrainGrid.Visibility = Visibility.Collapsed;
+            EqGrid.Visibility = Visibility.Visible;
+        }
+
+        private void ShowDiffuse(object sender, MouseButtonEventArgs e)
+        {
+            GrainGrid.Visibility = Visibility.Collapsed;
+            EqGrid.Visibility = Visibility.Collapsed;
+            DiffuseGrid.Visibility = Visibility.Visible;
+        }
+
+        private void ShowGrain(object sender, MouseButtonEventArgs e)
+        {
+            EqGrid.Visibility = Visibility.Collapsed;
+            DiffuseGrid.Visibility = Visibility.Collapsed;
+            GrainGrid.Visibility = Visibility.Visible;
+        }
+    }
 }
