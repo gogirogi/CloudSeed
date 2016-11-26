@@ -24,7 +24,7 @@ namespace CloudSeed.UI
 		private Parameter? activeControl;
 		private ProgramBanks.PluginProgram selectedProgram;
 
-		public CloudSeedViewModel(CloudSeedPlugin plugin)
+	    public CloudSeedViewModel(CloudSeedPlugin plugin)
 		{
 			this.plugin = plugin;
 
@@ -47,6 +47,10 @@ namespace CloudSeed.UI
 					var para = (Parameter)e.NewStartingIndex;
 					var val = (double)e.NewItems[0];
 					plugin.SetParameter(para, val);
+
+                    if (para == Parameter.LateMode)
+				        NotifyChanged(() => DelayMode);
+
 					NotifyChanged(() => ActiveControlDisplay);
 				}
 			};
@@ -87,7 +91,12 @@ namespace CloudSeed.UI
 		public ICommand LoadProgramCommand { get; private set; }
 		public ICommand DeleteProgramCommand { get; private set; }
 
-		public ObservableCollection<double> NumberedParameters
+	    public bool DelayMode
+	    {
+	        get { return NumberedParameters[(int)Parameter.LateMode] >= 0.5; }
+	    }
+
+	    public ObservableCollection<double> NumberedParameters
 		{
 			get;
 			private set;

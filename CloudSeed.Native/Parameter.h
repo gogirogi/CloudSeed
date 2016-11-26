@@ -25,9 +25,12 @@ enum class Parameter
 
 	// Late
 
+	LateMode,
 	LineCount,
 	LineDelay,
 	LineDecay,
+	LineDelayR,
+	LineDecayR,
 
 
 	LateDiffusionEnabled,

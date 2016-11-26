@@ -22,6 +22,12 @@ using namespace std;
 
 namespace CloudSeed
 {
+	enum class ChannelLR
+	{
+		Left,
+		Right
+	};
+
 	class ReverbChannel
 	{
 	private:
@@ -46,7 +52,6 @@ namespace CloudSeed
 
 		// Used the the main process loop
 		int lineCount;
-		double perLineGain;
 
 		bool highPassEnabled;
 		bool lowPassEnabled;
@@ -56,15 +61,20 @@ namespace CloudSeed
 		double earlyOut;
 		double lineOut;
 		double crossSeed;
+		bool delayMode;
+		ChannelLR channelLr;
 
 	public:
-		ReverbChannel(int bufferSize, int samplerate)
-			: preDelay(bufferSize, samplerate, 100) // 1 second delay buffer
+		
+		ReverbChannel(int bufferSize, int samplerate, ChannelLR leftOrRight)
+			: preDelay(bufferSize, samplerate * 1.0, 100) // 1 second delay buffer
 			, multitap(samplerate) // use samplerate = 1 second delay buffer
 			, highPass(samplerate)
 			, lowPass(samplerate)
-			, diffuser(bufferSize, samplerate) // 1 sec buffer
+			, diffuser(samplerate, 150) // 150ms buffer, to allow for 100ms + modulation time
 		{
+			this->channelLr = leftOrRight;
+
 			for (int i = 0; i < TotalLineCount; i++)
 				lines.push_back(new DelayLine(bufferSize, samplerate));
 
@@ -75,7 +85,6 @@ namespace CloudSeed
 
 			crossSeed = 0.0;
 			lineCount = 8;
-			perLineGain = GetPerLineGain();
 			diffuser.SetInterpolationEnabled(true);
 			highPass.SetCutoffHz(20);
 			lowPass.SetCutoffHz(20000);
@@ -183,14 +192,19 @@ namespace CloudSeed
 				diffuser.SetFeedback(value);
 				break;
 
+			case Parameter::LateMode:
+				delayMode = value >= 0.5;
+				UpdateLines();
+				break;
 			case Parameter::LineCount:
 				lineCount = (int)value;
-				perLineGain = GetPerLineGain();
 				break;
 			case Parameter::LineDelay:
+			case Parameter::LineDelayR:
 				UpdateLines();
 				break;
 			case Parameter::LineDecay:
+			case Parameter::LineDecayR:
 				UpdateLines();
 				break;
 
@@ -273,7 +287,8 @@ namespace CloudSeed
 				break;
 
 			case Parameter::CrossSeed:
-				crossSeed = value;
+
+				crossSeed = channelLr == ChannelLR::Right ? value : 0;
 				multitap.SetCrossSeed(value);
 				diffuser.SetCrossSeed(value);
 				UpdateLines();
@@ -328,6 +343,7 @@ namespace CloudSeed
 			int len = sampleCount;
 			auto predelayOutput = preDelay.GetOutput();
 			auto lowPassInput = highPassEnabled ? tempBuffer : input;
+			int effectiveLineCount = delayMode ? 1 : lineCount;
 
 			if (highPassEnabled)
 				highPass.Process(input, tempBuffer, len);
@@ -364,10 +380,10 @@ namespace CloudSeed
 			//for (int i = 0; i < len; i++)
 			//	tempBuffer[i] += crossMix[i];
 
-			for (int i = 0; i < lineCount; i++)
+			for (int i = 0; i < effectiveLineCount; i++)
 				lines[i]->Process(tempBuffer, len);
 
-			for (int i = 0; i < lineCount; i++)
+			for (int i = 0; i < effectiveLineCount; i++)
 			{
 				auto buf = lines[i]->GetOutput();
 
@@ -383,6 +399,7 @@ namespace CloudSeed
 				}
 			}
 
+			auto perLineGain = GetPerLineGain();
 			Utils::Gain(tempBuffer, perLineGain, len);
 			Utils::Copy(tempBuffer, lineOutBuffer, len);
 
@@ -419,13 +436,15 @@ namespace CloudSeed
 	private:
 		double GetPerLineGain()
 		{
-			return 1 / std::sqrt(lineCount);
+			return delayMode ? 1.0 : 1.0 / std::sqrt(lineCount);
 		}
 
 		void UpdateLines()
 		{
-			auto lineDelaySamples = (int)Ms2Samples(parameters[Parameter::LineDelay]);
-			auto lineDecayMillis = parameters[Parameter::LineDecay] * 1000;
+			auto useRightChannelValues = channelLr == ChannelLR::Right && delayMode;
+
+			auto lineDelaySamples = (int)Ms2Samples(parameters[useRightChannelValues ? Parameter::LineDelayR : Parameter::LineDelay]);
+			auto lineDecayMillis = parameters[useRightChannelValues ? Parameter::LineDecayR : Parameter::LineDecay] * 1000;
 			auto lineDecaySamples = Ms2Samples(lineDecayMillis);
 
 			auto lineModAmount = Ms2Samples(parameters[Parameter::LineModAmount]);
@@ -435,21 +454,20 @@ namespace CloudSeed
 			auto lateDiffusionModRate = parameters[Parameter::LateDiffusionModRate];
 
 			auto delayLineSeeds = ShaRandom::Generate(delayLineSeed, lines.size() * 3, crossSeed);
-			int count = lines.size();
+			int count = lines.size(); // if delay mode is one, then all the delay lines get set to the same length, but only the first one is actually processed.
+									// prevents clicks and crackles when turning back into random mode
 
 			for (int i = 0; i < count; i++)
 			{
 				auto modAmount = lineModAmount * (0.7 + 0.3 * delayLineSeeds[i + count]);
 				auto modRate = lineModRate * (0.7 + 0.3 * delayLineSeeds[i + 2 * count]) / samplerate;
 				
-				auto delaySamples = (0.1 + 0.9 * delayLineSeeds[i]) * lineDelaySamples;
+				auto delaySamples = delayMode ? lineDelaySamples : (0.5 + 1.0 * delayLineSeeds[i]) * lineDelaySamples; // in delayMode, just use the fixed delay value
 				if (delaySamples < modAmount + 2) // when the delay is set really short, and the modulation is very high
 					delaySamples = modAmount + 2; // the mod could actually take the delay time negative, prevent that! -- provide 2 extra sample as margin of safety
 
 				auto dbAfter1Iteration = delaySamples / lineDecaySamples * (-60); // lineDecay is the time it takes to reach T60
 				auto gainAfter1Iteration = Utils::DB2gain(dbAfter1Iteration);
-
-				
 
 				lines[i]->SetDelay((int)delaySamples);
 				lines[i]->SetFeedback(gainAfter1Iteration);

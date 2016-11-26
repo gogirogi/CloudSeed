@@ -67,11 +67,15 @@
             <Label Grid.Column="0" Content="Late Reverberation"  Style="{StaticResource MainLabelStyle}" />
         </Grid>
 
-        <Grid Grid.Row="0" Grid.Column="3">
+        <Grid Grid.Row="0" Grid.Column="3" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" /> 
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="Equalization"  Style="{StaticResource MainLabelStyle}" />
+            <Label Grid.Column="0" Content="EQ" Margin="5,0" Style="{StaticResource MainLabelStyle}" />
+            <Label Grid.Column="1" Content="Diffuse" Margin="5,0" Style="{StaticResource MainLabelStyle}" />
+            <Label Grid.Column="2" Content="Grain" Margin="5,0" Style="{StaticResource MainLabelStyle}" />
         </Grid>
 
         <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=BoxContainerStyle}">
@@ -177,39 +181,78 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="45" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
                 <Label Content="Time" Grid.Row="3" Grid.Column="0" />
-                <Label Content="Mod Amt." Grid.Row="3" Grid.Column="1" />
-                <Label Content="Delay" Grid.Row="3" Grid.Column="2" />
-                <Label Content="Mod Amt." Grid.Row="3" Grid.Column="3" />
+                <Label Content="Decay" Grid.Row="3" Grid.Column="1"  />
+                <Label Content="Time R" Grid.Row="5" Grid.Column="0"  Visibility="{Binding DelayMode, Converter={StaticResource bvc}}" />
+                <Label Content="Decay R" Grid.Row="5" Grid.Column="1" Visibility="{Binding DelayMode, Converter={StaticResource bvc}}" />
+                
+                <Label Content="Mod Amt." Grid.Row="3" Grid.Column="2" />
+                <Label Content="Mod Rate" Grid.Row="5" Grid.Column="2" />
 
-                <Label Content="Decay" Grid.Row="5" Grid.Column="0" />
-                <Label Content="Mod Rate" Grid.Row="5" Grid.Column="1" />
-                <Label Content="Feedback" Grid.Row="5" Grid.Column="2" />
-                <Label Content="Mod Rate" Grid.Row="5" Grid.Column="3" />
-
-                <wpfUi:FlatToggleButton cloudSeed:ParameterControl.Parameter="LateStageTap" Grid.Column="0" Grid.Row="0" IsChecked="True" TextOn="Post" TextOff="Pre" />
-                <wpfUi:Spinner cloudSeed:ParameterControl.Parameter="LineCount" Grid.Column="1" Grid.Row="0" Value="1" Min="1" Max="12" Delta="1" Sensitivity="20" Formatter="{}0" Default="1" />
-                <wpfUi:FlatToggleButton cloudSeed:ParameterControl.Parameter="LateDiffusionEnabled" Grid.Column="2" Grid.Row="0" IsChecked="True" />
-                <wpfUi:Spinner cloudSeed:ParameterControl.Parameter="LateDiffusionStages" Grid.Column="3" Grid.Row="0" Value="1" Min="1" Max="8" Delta="1" Sensitivity="20" Formatter="{}0" Default="1" />
+                <wpfUi:FlatToggleButton cloudSeed:ParameterControl.Parameter="LateMode" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" IsChecked="True" TextOn="Stereo Delay" TextOff="Random Spread" />
+                <wpfUi:Spinner cloudSeed:ParameterControl.Parameter="LineCount" Grid.Column="0" Grid.Row="0" Value="1" Min="1" Max="12" Delta="1" Sensitivity="20" Formatter="{}0" Default="1" 
+                               Visibility="{Binding DelayMode, FallbackValue=Visible, Converter={StaticResource ibvc}}" />
 
                 <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineDelay" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="0" />
-                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineModAmount" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="2" Grid.Column="1" />
-                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LateDiffusionDelay" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="2" />
-                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LateDiffusionModAmount" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="2" Grid.Column="3" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineDecay" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="1" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineDelayR" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="0" Visibility="{Binding DelayMode, FallbackValue=Visible, Converter={StaticResource bvc}}" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineDecayR" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="1" Visibility="{Binding DelayMode, FallbackValue=Visible, Converter={StaticResource bvc}}" />
 
-                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineDecay" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="0" />
-                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineModRate" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="4" Grid.Column="1" />
-                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LateDiffusionFeedback" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="2" />
-                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LateDiffusionModRate" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="4" Grid.Column="3" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineModAmount" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="2" Grid.Column="2" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LineModRate" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="4" Grid.Column="2" />
+
+                
+                
+                
+               
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ResourceKey=BoxContainerStyle}">
+        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ResourceKey=BoxContainerStyle}" Visibility="Visible">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <wpfUi:FlatToggleButton cloudSeed:ParameterControl.Parameter="LateStageTap" Grid.Column="0" Grid.Row="0" IsChecked="True" TextOn="Post" TextOff="Pre" />
+                <wpfUi:FlatToggleButton cloudSeed:ParameterControl.Parameter="LateDiffusionEnabled" Grid.Column="1" Grid.Row="0" IsChecked="True" />
+                <wpfUi:Spinner cloudSeed:ParameterControl.Parameter="LateDiffusionStages" Grid.Column="2" Grid.Row="0" Value="1" Min="1" Max="8" Delta="1" Sensitivity="20" Formatter="{}0" Default="1" />
+
+                <Label Content="Delay" Grid.Row="3" Grid.Column="1" />
+                <Label Content="Feedback" Grid.Row="5" Grid.Column="1" />
+                
+                <Label Content="Mod Amt." Grid.Row="3" Grid.Column="2" />
+                <Label Content="Mod Rate" Grid.Row="5" Grid.Column="2" />
+                
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LateDiffusionDelay" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="2" Grid.Column="1" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LateDiffusionFeedback" Style="{StaticResource ResourceKey=KnobStyle}" Grid.Row="4" Grid.Column="1" />
+                
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LateDiffusionModAmount" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="2" Grid.Column="2" />
+                <wpfUi:Knob2 cloudSeed:ParameterControl.Parameter="LateDiffusionModRate" Style="{StaticResource ResourceKey=KnobSmallStyle}" Grid.Row="4" Grid.Column="2" />
+
+                <!--Placeholders for size-->
+                <wpfUi:Knob2 Style="{StaticResource ResourceKey=KnobStyle}" Visibility="Hidden" Grid.Row="2" Grid.Column="0" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ResourceKey=BoxContainerStyle}" Visibility="Collapsed">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />

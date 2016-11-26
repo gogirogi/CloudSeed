@@ -28,12 +28,15 @@ namespace CloudSeed
 		DiffusionDelay,
 		DiffusionFeedback,
 
-		// Late
+        // Late
 
-		LineCount,
+        LateMode,
+        LineCount,
 		LineDelay,
 		LineDecay,
-		
+        LineDelayR,
+        LineDecayR,
+
 
         LateDiffusionEnabled,
 		LateDiffusionStages,
@@ -142,7 +145,8 @@ namespace CloudSeed
 		private static readonly Func<double, string> FrequencyDecimalFormatter = x => x.ToString("0.00", CultureInfo.InvariantCulture) + " Hz";
 		private static readonly Func<double, string> OnOffFormatter = x => x >= 0.5 ? "On" : "Off";
 		private static readonly Func<double, string> PrePostFormatter = x => x >= 0.5 ? "Post" : "Pre";
-		private static readonly Func<double, string> InterpolationFormatter = x => x >= 0.5 ? "Enabled" : "Disabled";
+        private static readonly Func<double, string> DelayrandomFormatter = x => x >= 0.5 ? "Stereo Delay" : "Random Seed";
+        private static readonly Func<double, string> InterpolationFormatter = x => x >= 0.5 ? "Enabled" : "Disabled";
 		private static readonly Func<double, string> DbFormatter = x =>
 		{
 			var val = AudioLib.Utils.Gain2DB(x);
@@ -170,11 +174,14 @@ namespace CloudSeed
 			{ Parameter.DiffusionDelay, MillisFormatter },
 			{ Parameter.DiffusionFeedback, DecimalFormatter },
 
-			{ Parameter.LineCount, IntFormatter },
+            { Parameter.LateMode, DelayrandomFormatter },
+            { Parameter.LineCount, IntFormatter },
 			{ Parameter.LineDelay, MillisFormatter },
 			{ Parameter.LineDecay, DecayFormatter },
+            { Parameter.LineDelayR, MillisFormatter },
+            { Parameter.LineDecayR, DecayFormatter },
 
-			{ Parameter.LateDiffusionEnabled, OnOffFormatter },
+            { Parameter.LateDiffusionEnabled, OnOffFormatter },
 			{ Parameter.LateDiffusionStages, IntFormatter },
 			{ Parameter.LateDiffusionDelay, MillisFormatter },
 			{ Parameter.LateDiffusionFeedback, DecimalFormatter },
