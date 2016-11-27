@@ -5,6 +5,7 @@
 #include "ModulatedDelay.h"
 #include "AllpassDiffuser.h"
 #include "AudioLib\Biquad.h"
+#include "ParticleDelay.h"
 
 using namespace AudioLib;
 
@@ -17,7 +18,7 @@ namespace CloudSeed
 		AllpassDiffuser diffuser;
 		Biquad lowShelf;
 		Biquad highShelf;
-		AudioLib::Lp1 lowPass;
+		Lp1 lowPass;
 		double* tempBuffer;
 		double* mixedBuffer;
 		double* filterOutputBuffer;
@@ -35,6 +36,7 @@ namespace CloudSeed
 
 		DelayLine(int bufferSize, int samplerate)
 			: lowPass(samplerate)
+			//, delay(bufferSize, samplerate, samplerate * 2, 10000) // 2 second buffer, to prevent buffer overflow with modulation and randomness added (Which may increase effective delay)
 			, delay(bufferSize, samplerate * 2, 10000) // 2 second buffer, to prevent buffer overflow with modulation and randomness added (Which may increase effective delay)
 			, diffuser(samplerate, 150) // 150ms buffer
 			, lowShelf(AudioLib::Biquad::FilterType::LowShelf, samplerate)

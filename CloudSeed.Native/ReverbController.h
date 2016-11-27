@@ -95,6 +95,14 @@ namespace CloudSeed
 			case Parameter::LateDiffusionDelay:        return (int)(10 + P(Parameter::LateDiffusionDelay) * 90);
 			case Parameter::LateDiffusionFeedback:     return P(Parameter::LateDiffusionFeedback);
 
+				// Grain
+			case Parameter::GrainCount:				   return 1 + (int)(P(Parameter::GrainCount) * 9.99);
+			case Parameter::GrainLength:			   return P(Parameter::GrainLength) * 100;
+			case Parameter::PitchShift:				   return -12.0 + P(Parameter::PitchShift) * 24.0;
+			case Parameter::PanSpread:				   return P(Parameter::PanSpread);
+			case Parameter::PitchRandom:               return P(Parameter::PitchRandom);
+			case Parameter::TimeRandom:                return P(Parameter::TimeRandom);
+
 				// Frequency Response
 			case Parameter::PostLowShelfGain:          return ValueTables::Get(P(Parameter::PostLowShelfGain), ValueTables::Response2Dec);
 			case Parameter::PostLowShelfFrequency:     return 20 + ValueTables::Get(P(Parameter::PostLowShelfFrequency), ValueTables::Response4Oct) * 980;

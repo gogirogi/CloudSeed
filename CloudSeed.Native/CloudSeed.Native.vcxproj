@@ -182,6 +182,7 @@ copy $(TargetDir)$(TargetFileName) $(SolutionDir)CloudSeed.Ui.Dev\bin\$(Platform
     <ClInclude Include="Default.h" />
     <ClInclude Include="DelayLine.h" />
     <ClInclude Include="FastSin.h" />
+    <ClInclude Include="ParticleDelay.h" />
     <ClInclude Include="ModulatedAllpass.h" />
     <ClInclude Include="ModulatedDelay.h" />
     <ClInclude Include="MultitapDiffuser.h" />

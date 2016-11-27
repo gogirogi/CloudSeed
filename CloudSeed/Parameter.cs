@@ -37,11 +37,18 @@ namespace CloudSeed
         LineDelayR,
         LineDecayR,
 
-
         LateDiffusionEnabled,
 		LateDiffusionStages,
 		LateDiffusionDelay,
 		LateDiffusionFeedback,
+
+        // Grain
+        GrainCount,
+        GrainLength,
+        PitchShift,
+        PanSpread,
+        PitchRandom,
+        TimeRandom,
 
 		// Frequency Response
 
@@ -186,7 +193,14 @@ namespace CloudSeed
 			{ Parameter.LateDiffusionDelay, MillisFormatter },
 			{ Parameter.LateDiffusionFeedback, DecimalFormatter },
 
-			{ Parameter.PostLowShelfGain, DbFormatter },
+            { Parameter.GrainCount, IntFormatter },
+            { Parameter.GrainLength, MillisFormatter },
+            { Parameter.PitchShift, DecimalFormatter },
+            { Parameter.PanSpread, DecimalFormatter },
+            { Parameter.PitchRandom, DecimalFormatter },
+            { Parameter.TimeRandom, DecimalFormatter },
+
+            { Parameter.PostLowShelfGain, DbFormatter },
 			{ Parameter.PostLowShelfFrequency, FrequencyFormatter },
 			{ Parameter.PostHighShelfGain, DbFormatter },
 			{ Parameter.PostHighShelfFrequency, FrequencyFormatter },

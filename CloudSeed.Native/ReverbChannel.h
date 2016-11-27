@@ -41,9 +41,9 @@ namespace CloudSeed
 		MultitapDiffuser multitap;
 		AllpassDiffuser diffuser;
 		vector<DelayLine*> lines;
-		AudioLib::ShaRandom rand;
-		AudioLib::Hp1 highPass;
-		AudioLib::Lp1 lowPass;
+		ShaRandom rand;
+		Biquad highPass;
+		Biquad lowPass;
 		double* tempBuffer;
 		double* lineOutBuffer;
 		double* outBuffer;
@@ -69,8 +69,8 @@ namespace CloudSeed
 		ReverbChannel(int bufferSize, int samplerate, ChannelLR leftOrRight)
 			: preDelay(bufferSize, samplerate * 1.0, 100) // 1 second delay buffer
 			, multitap(samplerate) // use samplerate = 1 second delay buffer
-			, highPass(samplerate)
-			, lowPass(samplerate)
+			, highPass(Biquad::FilterType::HighPass, samplerate)
+			, lowPass(Biquad::FilterType::LowPass, samplerate)
 			, diffuser(samplerate, 150) // 150ms buffer, to allow for 100ms + modulation time
 		{
 			this->channelLr = leftOrRight;
@@ -86,9 +86,15 @@ namespace CloudSeed
 			crossSeed = 0.0;
 			lineCount = 8;
 			diffuser.SetInterpolationEnabled(true);
-			highPass.SetCutoffHz(20);
-			lowPass.SetCutoffHz(20000);
 
+			highPass.Frequency = 20;
+			highPass.SetQ(0.7);
+			highPass.Update();
+			
+			lowPass.Frequency = 20000;
+			lowPass.SetQ(0.7);
+			lowPass.Update();
+			
 			tempBuffer = new double[bufferSize];
 			lineOutBuffer = new double[bufferSize];
 			outBuffer = new double[bufferSize];
@@ -155,10 +161,12 @@ namespace CloudSeed
 				preDelay.SampleDelay = (int)Ms2Samples(value);
 				break;
 			case Parameter::HighPass:
-				highPass.SetCutoffHz(value);
+				highPass.Frequency = value;
+				highPass.Update();
 				break;
 			case Parameter::LowPass:
-				lowPass.SetCutoffHz(value);
+				lowPass.Frequency = value;
+				lowPass.Update();
 				break;
 
 			case Parameter::TapCount:

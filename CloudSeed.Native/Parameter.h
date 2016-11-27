@@ -38,6 +38,14 @@ enum class Parameter
 	LateDiffusionDelay,
 	LateDiffusionFeedback,
 
+	// Grain
+	GrainCount,
+	GrainLength,
+	PitchShift,
+	PanSpread,
+	PitchRandom,
+	TimeRandom,
+
 	// Frequency Response
 
 	PostLowShelfGain,
